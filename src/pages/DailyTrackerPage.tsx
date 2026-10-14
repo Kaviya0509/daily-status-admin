@@ -67,6 +67,9 @@ import {
   Download,
   RefreshCw,
   User,
+  Mail,
+  CheckCircle2,
+  Clock,
 } from "lucide-react";
 import { cn } from "cn";
 
@@ -630,10 +633,7 @@ export default function DailyTrackerPage() {
       </div>
 
       {/* Filter Toolbar Card */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs space-y-4 relative overflow-hidden">
-        {/* Subtle accent highlight line at top */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#7C3AED] via-[#9333EA] to-[#3B82F6]" />
-
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4">
           {/* Search Input */}
           <div className="sm:col-span-2 lg:col-span-4 relative">
@@ -1294,12 +1294,12 @@ export default function DailyTrackerPage() {
       {/* Quick View Modal Dialog */}
       <Dialog open={!!previewReport} onOpenChange={(open: boolean) => !open && setPreviewReport(null)}>
         {previewReport && (
-          <DialogContent className="max-w-xl p-0 overflow-hidden rounded-2xl">
-            <DialogHeader className="p-6 bg-slate-900 text-white relative text-left">
-              <div className="flex items-center justify-between gap-4">
+          <DialogContent className="max-w-4xl w-[94vw] max-h-[calc(100dvh-2.5rem)] sm:max-h-[min(88vh,720px)] flex flex-col p-0 overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-2xl bg-white focus:outline-none">
+            <DialogHeader className="shrink-0 px-5 py-4 sm:px-6 sm:py-4.5 bg-white border-b border-slate-200/80 relative text-left">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pr-10">
                 <div className="flex items-center gap-3">
                   <div
-                    className={`h-10 w-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 ${getMenteeAvatarColor(
+                    className={`h-10 w-10 sm:h-11 sm:w-11 rounded-xl sm:rounded-2xl flex items-center justify-center font-black text-sm sm:text-base shadow-sm shrink-0 ring-2 ring-white shadow-purple-500/10 ${getMenteeAvatarColor(
                       previewReport.menteeName
                     )}`}
                   >
@@ -1312,111 +1312,177 @@ export default function DailyTrackerPage() {
                           .toUpperCase()
                       : "M"}
                   </div>
-                  <div>
-                    <DialogTitle className="text-base font-bold text-white">
+                  <div className="min-w-0">
+                    <DialogTitle className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2 truncate">
                       {previewReport.menteeName}
                     </DialogTitle>
-                    <DialogDescription className="text-xs text-slate-400">
-                      Report Date: {previewReport.reportDate}
+                    <DialogDescription className="flex items-center gap-3 mt-1 text-xs text-slate-500 flex-wrap">
+                      {previewReport.menteeEmail && (
+                        <span className="flex items-center gap-1.5 text-slate-500 font-medium">
+                          <Mail className="h-3.5 w-3.5 text-[#7C3AED] shrink-0" />
+                          <span className="truncate max-w-[200px]">{previewReport.menteeEmail}</span>
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1.5 text-slate-500 font-medium">
+                        <Calendar className="h-3.5 w-3.5 text-[#7C3AED] shrink-0" />
+                        Report Date: <strong className="text-slate-800 font-semibold">{previewReport.reportDate}</strong>
+                      </span>
                     </DialogDescription>
                   </div>
                 </div>
-                {renderStatusBadge(previewReport.status)}
+                <div className="shrink-0">
+                  {renderStatusBadge(previewReport.status)}
+                </div>
               </div>
             </DialogHeader>
 
-            <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  Current Task / Project
-                </label>
-                <p className="text-sm font-bold text-slate-900 bg-slate-50 p-3 rounded-xl border border-slate-200/70">
-                  {previewReport.currentTask}
-                </p>
+            <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5 bg-slate-50/30">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5">
+                {/* Primary Column (Left 7 cols) */}
+                <div className="md:col-span-7 space-y-4">
+                  {/* Current Task */}
+                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/90 bg-gradient-to-br from-slate-50/70 via-white to-purple-50/20 p-4 sm:p-4.5 space-y-1 shadow-2xs">
+                    <span className="text-[11px] font-bold text-[#7C3AED] uppercase tracking-wider block">
+                      Current Task / Project
+                    </span>
+                    <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
+                      {previewReport.currentTask}
+                    </h3>
+                  </div>
+
+                  {/* Detailed Work Description */}
+                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/90 bg-white p-4 sm:p-4.5 space-y-1.5 shadow-2xs">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                      Detailed Work Description
+                    </span>
+                    <div className="p-3 sm:p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 text-xs text-slate-800 font-normal leading-relaxed whitespace-pre-wrap max-h-44 sm:max-h-56 overflow-y-auto">
+                      {previewReport.shortDescription || "No detailed description provided."}
+                    </div>
+                  </div>
+
+                  {/* Additional Notes */}
+                  {previewReport.notes && (
+                    <div className="rounded-xl sm:rounded-2xl border border-slate-200/90 bg-white p-4 sm:p-4.5 space-y-1.5 shadow-2xs">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                        Additional Notes
+                      </span>
+                      <div className="p-3 sm:p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 text-xs text-slate-700 whitespace-pre-wrap leading-relaxed max-h-36 overflow-y-auto">
+                        {previewReport.notes}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Secondary Column (Right 5 cols) */}
+                <div className="md:col-span-5 space-y-4">
+                  {/* Blocker & Dependency */}
+                  <div
+                    className={cn(
+                      "rounded-xl sm:rounded-2xl p-4 border space-y-1.5 transition-all shadow-2xs",
+                      previewReport.blockerDependency
+                        ? "bg-rose-50/70 border-rose-200 text-rose-900"
+                        : "bg-emerald-50/40 border-emerald-200/70 text-emerald-900"
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      {previewReport.blockerDependency ? (
+                        <AlertTriangle className="h-4 w-4 text-rose-600 shrink-0" />
+                      ) : (
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                      )}
+                      <span
+                        className={cn(
+                          "text-[11px] font-bold uppercase tracking-wider",
+                          previewReport.blockerDependency ? "text-rose-700" : "text-emerald-700"
+                        )}
+                      >
+                        Blockers / Dependencies
+                      </span>
+                    </div>
+                    {previewReport.blockerDependency ? (
+                      <p className="text-xs text-rose-800 bg-white/80 p-2.5 rounded-xl border border-rose-200/80 leading-relaxed font-medium whitespace-pre-wrap max-h-32 overflow-y-auto">
+                        {previewReport.blockerDependency}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-emerald-700 font-medium">
+                        No active blockers or dependencies reported.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Idle Reason / Support Needed */}
+                  {previewReport.idleReasonWorkNeeded && (
+                    <div className="rounded-xl sm:rounded-2xl bg-amber-50/70 border border-amber-200/90 p-4 space-y-1.5 shadow-2xs text-amber-900">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 block">
+                        Idle Reason / Support Needed
+                      </span>
+                      <p className="text-xs text-amber-900 bg-white/80 p-2.5 rounded-xl border border-amber-200/70 leading-relaxed whitespace-pre-wrap font-medium max-h-32 overflow-y-auto">
+                        {previewReport.idleReasonWorkNeeded}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Lead & Timeline Card Grid */}
+                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/90 bg-white p-4 space-y-2.5 shadow-2xs">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                      Assignment & Timeline
+                    </span>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-slate-50/80 border border-slate-100 text-xs">
+                        <span className="text-slate-500 font-medium flex items-center gap-1.5">
+                          <User className="h-3.5 w-3.5 text-[#7C3AED]" />
+                          Reporting Lead
+                        </span>
+                        <strong className="text-slate-900 font-bold">
+                          {previewReport.managerLead || "None specified"}
+                        </strong>
+                      </div>
+
+                      <div className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-slate-50/80 border border-slate-100 text-xs">
+                        <span className="text-slate-500 font-medium flex items-center gap-1.5">
+                          <Calendar className="h-3.5 w-3.5 text-blue-500" />
+                          Target Completion
+                        </span>
+                        <strong className="text-slate-900 font-bold">
+                          {previewReport.expectedCompletion || "No date set"}
+                        </strong>
+                      </div>
+
+                      <div className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-slate-50/80 border border-slate-100 text-xs">
+                        <span className="text-slate-500 font-medium flex items-center gap-1.5">
+                          <Clock className="h-3.5 w-3.5 text-amber-500" />
+                          Report ID
+                        </span>
+                        <span className="text-slate-600 font-mono text-[11px] truncate max-w-[140px]" title={previewReport.reportId}>
+                          {previewReport.reportId}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  Work Description
-                </label>
-                <p className="text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200/70 whitespace-pre-wrap leading-relaxed">
-                  {previewReport.shortDescription}
-                </p>
-              </div>
-
-              {previewReport.blockerDependency && (
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-rose-600 uppercase tracking-wider flex items-center gap-1.5">
-                    <AlertTriangle className="h-3.5 w-3.5" />
-                    Blocker / Dependency Details
-                  </label>
-                  <p className="text-xs text-rose-800 bg-rose-50 p-3 rounded-xl border border-rose-200 whitespace-pre-wrap leading-relaxed font-medium">
-                    {previewReport.blockerDependency}
-                  </p>
-                </div>
-              )}
-
-              {previewReport.idleReasonWorkNeeded && (
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">
-                    Idle Reason / Support Needed
-                  </label>
-                  <p className="text-xs text-amber-800 bg-amber-50 p-3 rounded-xl border border-amber-200 whitespace-pre-wrap leading-relaxed">
-                    {previewReport.idleReasonWorkNeeded}
-                  </p>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 space-y-0.5">
-                  <span className="text-[10px] font-semibold text-slate-400 uppercase">
-                    Reporting Lead
-                  </span>
-                  <p className="text-xs font-bold text-slate-800">
-                    {previewReport.managerLead || "None specified"}
-                  </p>
-                </div>
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 space-y-0.5">
-                  <span className="text-[10px] font-semibold text-slate-400 uppercase">
-                    Target Completion
-                  </span>
-                  <p className="text-xs font-bold text-slate-800">
-                    {previewReport.expectedCompletion || "No date set"}
-                  </p>
-                </div>
-              </div>
-
-              {previewReport.notes && (
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Additional Notes
-                  </label>
-                  <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200/70 whitespace-pre-wrap">
-                    {previewReport.notes}
-                  </p>
-                </div>
-              )}
             </div>
 
-            <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+            <div className="shrink-0 px-5 py-3 sm:px-6 sm:py-3.5 bg-slate-50/95 border-t border-slate-200 flex items-center justify-between gap-3">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setPreviewReport(null)}
-                className="rounded-xl"
+                className="rounded-xl border-slate-200 text-slate-700 hover:bg-slate-100 h-8.5 sm:h-9 px-4 font-medium cursor-pointer"
               >
                 Close Preview
               </Button>
               <Button
                 size="sm"
-                className="bg-gradient-to-r from-[#7C3AED] to-[#9333EA] hover:from-[#6D28D9] hover:to-[#7C3AED] text-white font-semibold rounded-xl shadow-xs"
+                className="bg-gradient-to-r from-[#7C3AED] to-[#9333EA] hover:from-[#6D28D9] hover:to-[#7C3AED] text-white font-semibold rounded-xl h-8.5 sm:h-9 px-5 shadow-xs flex items-center gap-1.5 cursor-pointer"
                 onClick={() => {
                   const id = previewReport.reportId;
                   setPreviewReport(null);
                   navigate(`/reports/${id}?edit=true`);
                 }}
               >
-                <Pencil className="h-3.5 w-3.5 mr-1.5" />
+                <Pencil className="h-3.5 w-3.5" />
                 Edit Full Report
               </Button>
             </div>
