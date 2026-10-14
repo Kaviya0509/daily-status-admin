@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="adminBg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7C3AED" />
+      <stop offset="0.5" stop-color="#8B5CF6" />
+      <stop offset="1" stop-color="#4F46E5" />
+    </linearGradient>
+    <filter id="shadow" x="0" y="4" width="64" height="60" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#4C1D95" flood-opacity="0.3" />
+    </filter>
+  </defs>
+  <!-- Rounded Squircle Badge -->
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="url(#adminBg)" />
+  <rect x="4.5" y="4.5" width="55" height="55" rx="15.5" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="1" />
+  <!-- Shield Emblem with Checkmark -->
+  <g filter="url(#shadow)">
+    <path d="M32 15C32 15 43 17 45 22C47 27 45 37 32 47C19 37 17 27 19 22C21 17 32 15 32 15Z" fill="white" />
+    <path d="M26 31L30 35L38 25" stroke="#7C3AED" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>
