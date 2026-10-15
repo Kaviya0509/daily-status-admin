@@ -475,16 +475,6 @@ export default function DailyTrackerPage() {
         size: 180,
       },
       {
-        accessorKey: "managerLead",
-        header: "Lead",
-        cell: (info) => (
-          <span className="text-xs font-medium text-slate-600">
-            {(info.row.original as MenteeReport).managerLead || "—"}
-          </span>
-        ),
-        size: 110,
-      },
-      {
         accessorKey: "expectedCompletion",
         header: "Target Date",
         cell: (info) => {
@@ -1059,11 +1049,7 @@ export default function DailyTrackerPage() {
                     )}
 
                     {/* Metadata Grid */}
-                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100 text-xs">
-                      <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Lead</span>
-                        <span className="font-semibold text-slate-700 truncate block">{report.managerLead || "—"}</span>
-                      </div>
+                    <div className="pt-1 border-t border-slate-100 text-xs">
                       <div>
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Target</span>
                         <span className="font-semibold text-slate-700 truncate block">{report.expectedCompletion || "—"}</span>
@@ -1285,11 +1271,6 @@ export default function DailyTrackerPage() {
                                   : "—"}
                               </span>
                             </div>
-                          </TableCell>
-                          <TableCell className="py-3 px-3.5 whitespace-nowrap">
-                            <span className="text-xs font-medium text-slate-600">
-                              {report.managerLead || "—"}
-                            </span>
                           </TableCell>
                           <TableCell className="py-3 px-3.5 whitespace-nowrap">
                             <span className="text-xs text-slate-600">
@@ -1544,16 +1525,6 @@ export default function DailyTrackerPage() {
                     </span>
 
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-slate-50/80 border border-slate-100 text-xs">
-                        <span className="text-slate-500 font-medium flex items-center gap-1.5">
-                          <User className="h-3.5 w-3.5 text-[#7C3AED]" />
-                          Reporting Lead
-                        </span>
-                        <strong className="text-slate-900 font-bold">
-                          {previewReport.managerLead || "None specified"}
-                        </strong>
-                      </div>
-
                       <div className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-slate-50/80 border border-slate-100 text-xs">
                         <span className="text-slate-500 font-medium flex items-center gap-1.5">
                           <Calendar className="h-3.5 w-3.5 text-blue-500" />
