@@ -1,10 +1,13 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { signOut } from "@/services/authService";
 import { format } from "date-fns";
 import {
   ShieldCheck,
   Calendar,
   ChevronRight,
+  LogOut,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -12,6 +15,12 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login", { replace: true });
+  };
 
   const getPageTitle = () => {
     if (location.pathname.startsWith("/reports")) return "Report Details";
@@ -55,6 +64,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <Calendar className="h-3.5 w-3.5 text-slate-500" />
             <span>{format(new Date(), "EEE, MMM d, yyyy")}</span>
           </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 px-3 rounded-lg text-xs font-semibold text-slate-600 border-slate-200 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-colors"
+            onClick={handleSignOut}
+          >
+            <LogOut className="h-3.5 w-3.5 mr-1.5" />
+            Logout
+          </Button>
         </div>
       </header>
 
