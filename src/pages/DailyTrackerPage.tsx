@@ -9,7 +9,8 @@ import {
   type ColumnDef,
   type SortingState,
 } from "@tanstack/react-table";
-import { format, startOfWeek, endOfWeek, parseISO, subDays } from "date-fns";
+import { format, startOfWeek, endOfWeek, parseISO, subDays, startOfMonth } from "date-fns";
+import { toast } from "sonner";
 import {
   getAllReports,
   getActiveMentees,
@@ -326,7 +327,7 @@ export default function DailyTrackerPage() {
     });
   };
 
-  const handleExport = async (exportType: string) => {
+  const handleExport = async (exportType: "range" | "today" | "all" | "filtered" = "range") => {
     setExporting(true);
     try {
       let exportFilters = { ...filters };
@@ -335,13 +336,27 @@ export default function DailyTrackerPage() {
         exportFilters = { search: "", startDate: todayStr, endDate: todayStr, menteeUid: "", status: "" };
       } else if (exportType === "all") {
         exportFilters = { search: "", startDate: "", endDate: "", menteeUid: "", status: "" };
+      } else {
+        // "range" or "filtered"
+        exportFilters = { ...filters };
       }
 
       const allReports = await getReportsForExport(exportFilters);
+      if (!allReports || allReports.length === 0) {
+        toast.info("No reports found matching the selected date criteria to export.");
+        return;
+      }
       const filename = generateExportFilename(exportFilters);
       exportToExcel(allReports, filename);
+      const rangeDesc = exportFilters.startDate && exportFilters.endDate
+        ? ` (${exportFilters.startDate} to ${exportFilters.endDate})`
+        : exportFilters.startDate
+        ? ` (from ${exportFilters.startDate})`
+        : "";
+      toast.success(`Exported ${allReports.length} report${allReports.length === 1 ? "" : "s"} to Excel${rangeDesc}!`);
     } catch (err) {
       console.error("Error exporting:", err);
+      toast.error("Failed to export Excel file. Please try again.");
     } finally {
       setExporting(false);
     }
@@ -612,18 +627,24 @@ export default function DailyTrackerPage() {
               ) : (
                 <FileSpreadsheet className="h-4 w-4 mr-1.5" />
               )}
-              Export Excel
+              {filters.startDate || filters.endDate ? "Export Range Excel" : "Export Excel"}
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => handleExport("today")}>
+            <DropdownMenuContent align="end" className="w-56">
+              {(filters.startDate || filters.endDate) && (
+                <DropdownMenuItem onClick={() => handleExport("range")} className="font-semibold text-[#7C3AED] bg-purple-50/70 cursor-pointer">
+                  <FileSpreadsheet className="h-4 w-4 mr-2 text-[#7C3AED]" />
+                  Export Date Range ({filters.startDate || "Start"} → {filters.endDate || "Today"})
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={() => handleExport("today")} className="cursor-pointer">
                 <Calendar className="h-4 w-4 mr-2 text-slate-500" />
-                Export Today
+                Export Today Only
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExport("filtered")}>
+              <DropdownMenuItem onClick={() => handleExport("filtered")} className="cursor-pointer">
                 <Filter className="h-4 w-4 mr-2 text-slate-500" />
-                Export Current Filters
+                Export Current Filters ({reports.length} reports)
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExport("all")}>
+              <DropdownMenuItem onClick={() => handleExport("all")} className="cursor-pointer">
                 <Download className="h-4 w-4 mr-2 text-slate-500" />
                 Export All History
               </DropdownMenuItem>
@@ -636,7 +657,7 @@ export default function DailyTrackerPage() {
       <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4">
           {/* Search Input */}
-          <div className="sm:col-span-2 lg:col-span-4 relative">
+          <div className="sm:col-span-2 lg:col-span-3 relative">
             <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
               <Search className="h-3.5 w-3.5 text-[#7C3AED]" />
               Search Content
@@ -758,16 +779,55 @@ export default function DailyTrackerPage() {
             </Select>
           </div>
 
-          {/* Date Filter */}
-          <div className="sm:col-span-2 lg:col-span-3">
-            <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <Calendar className="h-3.5 w-3.5 text-[#7C3AED]" />
-              Report Date
-            </label>
+          {/* From Date */}
+          <div className="sm:col-span-1 lg:col-span-2">
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5 text-[#7C3AED]" />
+                From Date
+              </label>
+              {filters.startDate && (
+                <button
+                  type="button"
+                  onClick={() => setFilters((f) => ({ ...f, startDate: "" }))}
+                  className="text-[10px] text-slate-400 hover:text-rose-500 cursor-pointer font-medium"
+                  title="Clear start date"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
             <Input
               type="date"
               value={filters.startDate}
-              onChange={(e) => setFilters((f) => ({ ...f, startDate: e.target.value, endDate: e.target.value }))}
+              onChange={(e) => setFilters((f) => ({ ...f, startDate: e.target.value }))}
+              className="h-10 text-xs rounded-xl border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/15 transition-all shadow-2xs font-medium px-3"
+            />
+          </div>
+
+          {/* To Date */}
+          <div className="sm:col-span-1 lg:col-span-2">
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5 text-[#7C3AED]" />
+                To Date
+              </label>
+              {filters.endDate && (
+                <button
+                  type="button"
+                  onClick={() => setFilters((f) => ({ ...f, endDate: "" }))}
+                  className="text-[10px] text-slate-400 hover:text-rose-500 cursor-pointer font-medium"
+                  title="Clear end date"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <Input
+              type="date"
+              value={filters.endDate}
+              min={filters.startDate || undefined}
+              onChange={(e) => setFilters((f) => ({ ...f, endDate: e.target.value }))}
               className="h-10 text-xs rounded-xl border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/15 transition-all shadow-2xs font-medium px-3"
             />
           </div>
@@ -778,6 +838,7 @@ export default function DailyTrackerPage() {
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-slate-500 font-semibold mr-1">Date Presets:</span>
             <button
+              type="button"
               onClick={() => setFilters((f) => ({ ...f, startDate: todayStr, endDate: todayStr }))}
               className={cn(
                 "h-8 text-xs px-3 rounded-xl border transition-all cursor-pointer font-medium flex items-center gap-1.5",
@@ -790,6 +851,7 @@ export default function DailyTrackerPage() {
               Today
             </button>
             <button
+              type="button"
               onClick={() => setFilters((f) => ({ ...f, startDate: yesterdayStr, endDate: yesterdayStr }))}
               className={cn(
                 "h-8 text-xs px-3 rounded-xl border transition-all cursor-pointer font-medium flex items-center gap-1.5",
@@ -800,14 +862,67 @@ export default function DailyTrackerPage() {
             >
               Yesterday
             </button>
+            <button
+              type="button"
+              onClick={() =>
+                setFilters((f) => ({
+                  ...f,
+                  startDate: format(subDays(new Date(), 7), "yyyy-MM-dd"),
+                  endDate: todayStr,
+                }))
+              }
+              className={cn(
+                "h-8 text-xs px-3 rounded-xl border transition-all cursor-pointer font-medium flex items-center gap-1.5",
+                filters.startDate === format(subDays(new Date(), 7), "yyyy-MM-dd") && filters.endDate === todayStr
+                  ? "bg-[#7C3AED] text-white border-[#7C3AED] shadow-xs font-semibold"
+                  : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
+              )}
+            >
+              Last 7 Days
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setFilters((f) => ({
+                  ...f,
+                  startDate: format(startOfMonth(new Date()), "yyyy-MM-dd"),
+                  endDate: todayStr,
+                }))
+              }
+              className={cn(
+                "h-8 text-xs px-3 rounded-xl border transition-all cursor-pointer font-medium flex items-center gap-1.5",
+                filters.startDate === format(startOfMonth(new Date()), "yyyy-MM-dd") && filters.endDate === todayStr
+                  ? "bg-[#7C3AED] text-white border-[#7C3AED] shadow-xs font-semibold"
+                  : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
+              )}
+            >
+              This Month
+            </button>
             {(filters.startDate || filters.endDate) && (
-              <button
-                onClick={() => setFilters((f) => ({ ...f, startDate: "", endDate: "" }))}
-                className="h-8 text-xs px-2.5 rounded-xl border border-dashed border-slate-300 text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-1 cursor-pointer"
-              >
-                <X className="h-3 w-3" />
-                Clear Date
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => setFilters((f) => ({ ...f, startDate: "", endDate: "" }))}
+                  className="h-8 text-xs px-2.5 rounded-xl border border-dashed border-slate-300 text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  <X className="h-3 w-3" />
+                  Clear Dates
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleExport("range")}
+                  disabled={exporting}
+                  className="h-8 text-xs px-3 rounded-xl bg-purple-50 border border-purple-200 text-[#7C3AED] hover:bg-purple-100 hover:text-[#6D28D9] transition-all cursor-pointer font-semibold flex items-center gap-1.5 shadow-2xs"
+                  title="Export Excel for this selected date range"
+                >
+                  {exporting ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Download className="h-3 w-3" />
+                  )}
+                  Export This Range ({reports.length})
+                </button>
+              </>
             )}
           </div>
 
