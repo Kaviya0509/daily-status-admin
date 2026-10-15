@@ -29,7 +29,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-cover bg-center bg-no-repeat bg-fixed text-slate-900 font-sans antialiased" style={{ backgroundImage: "url('/admin-bg.png')" }}>
+    <div className="relative min-h-screen flex flex-col text-slate-900 font-sans antialiased">
+      <div className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-45 -z-10" style={{ backgroundImage: "url('/admin-bg.png')" }} />
       {/* Top Navbar Header */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200/60 px-4 sm:px-6 lg:px-10 py-3.5 flex items-center justify-between gap-4 transition-all">
         <div className="flex items-center gap-3">
