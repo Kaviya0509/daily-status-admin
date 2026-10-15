@@ -1,6 +1,6 @@
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-import { format, parseISO, startOfWeek, endOfWeek, getWeek, getMonth } from "date-fns";
+import { format, parseISO, startOfWeek, endOfWeek, getMonth } from "date-fns";
 import type { MenteeReport, ReportFilters } from "@/types";
 
 export function generateExportFilename(filters: ReportFilters): string {
