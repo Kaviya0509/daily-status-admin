@@ -4,7 +4,7 @@ import { format, parseISO, startOfWeek, endOfWeek, getMonth } from "date-fns";
 import type { MenteeReport, ReportFilters } from "@/types";
 
 export function generateExportFilename(filters: ReportFilters): string {
-  const prefix = "Mentee_Daily_Status";
+  const prefix = "Daily_Report_Status";
 
   if (filters.startDate && filters.endDate && filters.startDate === filters.endDate) {
     return `${prefix}_${filters.startDate}.xlsx`;
@@ -22,6 +22,7 @@ export function generateExportFilename(filters: ReportFilters): string {
 const COLUMNS = [
   { header: "Date", width: 14 },
   { header: "Name", width: 25 },
+  { header: "Project Manager / Lead", width: 22 },
   { header: "Current Task / Project", width: 35 },
   { header: "Status", width: 16 },
   { header: "Short description", width: 35 },
@@ -134,7 +135,7 @@ function formatDateForExcel(dateStr: string): string {
 
 function addTitleRow(ws: ExcelJS.Worksheet, rowNum: number): number {
   const row = ws.getRow(rowNum);
-  row.getCell(1).value = "DAILY TEAM STATUS TRACKER";
+  row.getCell(1).value = "DAILY REPORT TRACKER";
   row.getCell(1).font = TITLE_FONT;
   row.getCell(1).alignment = { horizontal: "center", vertical: "middle" };
   row.getCell(1).fill = TITLE_FILL;
@@ -187,6 +188,7 @@ function addDataRow(ws: ExcelJS.Worksheet, rowNum: number, report: MenteeReport)
   const values = [
     formatDateForExcel(report.reportDate),
     report.menteeName || "",
+    report.managerLead || "",
     report.currentTask || "",
     report.status || "",
     report.shortDescription || "",
@@ -208,7 +210,7 @@ function addDataRow(ws: ExcelJS.Worksheet, rowNum: number, report: MenteeReport)
 
 export function exportToExcel(reports: MenteeReport[], filename: string): void {
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = "Mentee Admin Portal";
+  workbook.creator = "Daily Report Admin Portal";
   workbook.created = new Date();
 
   const ws = workbook.addWorksheet("Daily Status Tracker", {

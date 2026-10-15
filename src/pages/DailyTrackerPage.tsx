@@ -418,6 +418,23 @@ export default function DailyTrackerPage() {
         size: 170,
       },
       {
+        accessorKey: "managerLead",
+        header: "Manager / Lead",
+        cell: (info) => {
+          const report = info.row.original as MenteeReport;
+          const hasLead = report.managerLead && report.managerLead.trim().length > 0;
+          return (
+            <span
+              className={`text-xs ${hasLead ? "font-semibold text-slate-900" : "text-slate-400"}`}
+              title={report.managerLead}
+            >
+              {hasLead ? truncate(report.managerLead, 20) : "—"}
+            </span>
+          );
+        },
+        size: 140,
+      },
+      {
         accessorKey: "currentTask",
         header: "Current Task",
         cell: (info) => {
@@ -1034,6 +1051,14 @@ export default function DailyTrackerPage() {
                       </div>
                     </div>
 
+                    {/* Manager / Lead */}
+                    {report.managerLead && report.managerLead.trim().length > 0 && (
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Manager / Lead</p>
+                        <p className="text-xs font-semibold text-slate-800">{report.managerLead}</p>
+                      </div>
+                    )}
+
                     {/* Task Title */}
                     <div className="space-y-1">
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Current Task</p>
@@ -1100,7 +1125,7 @@ export default function DailyTrackerPage() {
 
         {/* Desktop: Table Layout */}
         <div className="hidden lg:block overflow-x-auto">
-          <Table className="min-w-[1450px]">
+          <Table className="min-w-[1590px]">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow
@@ -1229,6 +1254,14 @@ export default function DailyTrackerPage() {
                                 {report.menteeName}
                               </span>
                             </div>
+                          </TableCell>
+                          <TableCell className="py-3 px-3.5">
+                            <span
+                              className={`text-xs ${report.managerLead && report.managerLead.trim().length > 0 ? "font-semibold text-slate-900" : "text-slate-400"}`}
+                              title={report.managerLead}
+                            >
+                              {report.managerLead && report.managerLead.trim().length > 0 ? report.managerLead : "—"}
+                            </span>
                           </TableCell>
                           <TableCell className="py-3 px-3.5">
                             <span
@@ -1525,6 +1558,16 @@ export default function DailyTrackerPage() {
                     </span>
 
                     <div className="space-y-2">
+                      <div className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-slate-50/80 border border-slate-100 text-xs">
+                        <span className="text-slate-500 font-medium flex items-center gap-1.5">
+                          <User className="h-3.5 w-3.5 text-indigo-500" />
+                          Manager / Lead
+                        </span>
+                        <strong className="text-slate-900 font-bold">
+                          {previewReport.managerLead || "Unassigned"}
+                        </strong>
+                      </div>
+
                       <div className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-slate-50/80 border border-slate-100 text-xs">
                         <span className="text-slate-500 font-medium flex items-center gap-1.5">
                           <Calendar className="h-3.5 w-3.5 text-blue-500" />
