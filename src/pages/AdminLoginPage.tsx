@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ShieldCheck, Loader2, Lock, Mail, Eye, EyeOff, Sparkles, CheckCircle2 } from "lucide-react";
+import { Loader2, Lock, Mail, Eye, EyeOff, Sparkles, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 
@@ -91,14 +91,14 @@ export default function AdminLoginPage() {
 
       <div className="w-full max-w-md relative z-10 space-y-6">
         {/* Brand Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-gradient-to-tr from-[#7C3AED] via-[#8B5CF6] to-[#C084FC] shadow-xl shadow-purple-500/20 p-1 mb-2">
-            <div className="h-full w-full bg-white/10 backdrop-blur-xs rounded-[14px] flex items-center justify-center">
-              <ShieldCheck className="h-8 w-8 text-white" />
-            </div>
-          </div>
+        <div className="text-center space-y-3">
+          <img
+            src="/gwc-logo.png"
+            alt="GWC DATA.AI"
+            className="h-10 sm:h-12 object-contain mx-auto mb-1"
+          />
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            Admin Portal
+            Daily Report Tracker
           </h1>
           <p className="text-xs sm:text-sm text-slate-500">
             Mentee Daily Status & Performance Tracking
@@ -123,7 +123,6 @@ export default function AdminLoginPage() {
                   <span className="flex-1">{error}</span>
                 </div>
               )}
-
 
               <div className="space-y-1.5">
                 <Label htmlFor="email" className="text-xs font-semibold text-slate-700">
